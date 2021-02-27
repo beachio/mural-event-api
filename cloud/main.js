@@ -66,6 +66,7 @@ const getMyTalks = async (participant, siteId) => {
         id: parseTalk.id,
         start: parseTalk.get('start'),
         end: parseTalk.get('end'),
+        title: parseTalk.get('title'),
         slug: parseTalk.get('slug')
       }));
     }
@@ -116,9 +117,12 @@ Parse.Cloud.define("joinTalk", async(request) => {
     }
 
     const myTalks = await getMyTalks(participantId, siteId);
+    const duplicateSlotTalk = isTimeslotAvailable(myTalks, start);
+    if (!!duplicateSlotTalk) {
+      throw(`You are unable to join this session as you are already booked for ${talk.title} at ${talk.start}.`);
+    }
     let isJoinable = self_assign && isTimeslotAvailable(myTalks, start);
     if (!isJoinable) {
-      throw('Not joinable: Timeslot unavailable.');
     }
     isJoinable = isJoinable && abracademyConditionCheck(myTalks, slug);
     if (!isJoinable) {
@@ -221,9 +225,9 @@ Parse.Cloud.define("dropTalk", async(request) => {
 /* isJoinable check utility functions */
 const isTimeslotAvailable = (myTalks, start) => {
   for (const talk of myTalks) {
-    if (talk.start === start) return false;
+    if (talk.start === start) return talk;
   }
-  return true;
+  return null;
 }
 
 const abracademyConditionCheck = (myTalks, slug) => {
