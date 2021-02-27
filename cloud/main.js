@@ -118,13 +118,12 @@ Parse.Cloud.define("joinTalk", async(request) => {
 
     const myTalks = await getMyTalks(participantId, siteId);
     const duplicateSlotTalk = isTimeslotAvailable(myTalks, start);
-    if (!!duplicateSlotTalk) {
-      throw(`You are unable to join this session as you are already booked for ${talk.title} at ${talk.start}.`);
+    
+    if (duplicateSlotTalk !== null) {
+      throw(`You are unable to join this session as you are already booked for ${duplicateSlotTalk.title} at ${duplicateSlotTalk.start}.`);
     }
-    let isJoinable = self_assign && isTimeslotAvailable(myTalks, start);
-    if (!isJoinable) {
-    }
-    isJoinable = isJoinable && abracademyConditionCheck(myTalks, slug);
+    
+    const isJoinable = abracademyConditionCheck(myTalks, slug);
     if (!isJoinable) {
       throw('Not joinable: Abracademy unavailable.');
     }
@@ -225,6 +224,7 @@ Parse.Cloud.define("dropTalk", async(request) => {
 /* isJoinable check utility functions */
 const isTimeslotAvailable = (myTalks, start) => {
   for (const talk of myTalks) {
+    if (Date.parse(talk.start) === Date.parse(start)) return talk;
     if (talk.start === start) return talk;
   }
   return null;
