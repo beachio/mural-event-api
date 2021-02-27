@@ -98,3 +98,8 @@ Parse.Cloud.define("claimPoints", async request => {
   const result = await claimPoints(code, participant, siteId);
   return result;
 });
+
+
+
+
+
