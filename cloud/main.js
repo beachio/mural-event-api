@@ -1,4 +1,3 @@
-const { format } = require('date-fns');
 const {config, SITE, ROLE_ADMIN, ROLE_EDITOR, promisifyW, getAllObjects} = require('./common');
 
 const {getPayPlan} = require('./payment');
@@ -121,7 +120,7 @@ Parse.Cloud.define("joinTalk", async(request) => {
     const duplicateSlotTalk = isTimeslotAvailable(myTalks, start);
     
     if (duplicateSlotTalk !== null) {
-      throw(`You are unable to join this session as you are already booked for ${duplicateSlotTalk.title} at ${format(duplicateSlotTalk.start, 'iii dd MMM HH:mm')}.`);
+      throw(`You are unable to join this session as you are already booked for ${duplicateSlotTalk.title} at ${duplicateSlotTalk.start}.`);
     }
     
     const isJoinable = abracademyConditionCheck(myTalks, slug);
